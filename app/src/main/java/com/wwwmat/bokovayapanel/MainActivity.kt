@@ -39,8 +39,8 @@ class MainActivity : ComponentActivity() {
             Text("Количество панелей: $count", color=Color.White)
             Slider(count.toFloat(), { count=it.toInt().coerceIn(1,10); PanelData.setCount(this@MainActivity,count) }, valueRange=1f..10f, steps=8)
             Text("Полоска активации", color=Color.White)
-            Text("Ширина: $width%", color=Color.White); Slider(width.toFloat(),{width=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=4f..40f)
-            Text("Высота: $height%", color=Color.White); Slider(height.toFloat(),{height=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=4f..100f)
+            Text("Толщина полоски: $width dp", color=Color.White); Slider(width.toFloat(),{width=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=8f..40f)
+            Text("Высота полоски: $height% экрана", color=Color.White); Slider(height.toFloat(),{height=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=10f..100f)
             Text("Положение по вертикали: $y%", color=Color.White); Slider(y.toFloat(),{y=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=0f..100f)
             Button(onClick={ if(!Settings.canDrawOverlays(this@MainActivity)) startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) else startService(Intent(this@MainActivity,PanelService::class.java)) }, modifier=Modifier.fillMaxWidth()) { Text(if(Settings.canDrawOverlays(this@MainActivity)) "Запустить боковую панель" else "Разрешить отображение поверх окон") }
             OutlinedButton(onClick={stopService(Intent(this@MainActivity,PanelService::class.java))}, modifier=Modifier.fillMaxWidth()) { Text("Остановить панель") }
