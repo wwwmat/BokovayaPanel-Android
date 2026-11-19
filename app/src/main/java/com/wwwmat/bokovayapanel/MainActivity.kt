@@ -11,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -56,6 +55,8 @@ class MainActivity : ComponentActivity() {
         var title by remember { mutableStateOf(cfg.title) }
         var alpha by remember { mutableFloatStateOf(cfg.alpha.toFloat()) }
         var showApps by remember { mutableStateOf(false) }
+        var showUrl by remember { mutableStateOf(false) }
+        var url by remember { mutableStateOf("https://") }
         val pm=packageManager
         val apps=remember { pm.getInstalledApplications(0).filter { pm.getLaunchIntentForPackage(it.packageName)!=null && it.packageName!=packageName }.sortedBy { pm.getApplicationLabel(it).toString().lowercase() } }
         Column(Modifier.fillMaxSize().background(Color(0xFF101915)).padding(18.dp)) {
@@ -63,11 +64,12 @@ class MainActivity : ComponentActivity() {
             OutlinedTextField(title,{title=it},label={Text("Название панели")},modifier=Modifier.fillMaxWidth())
             Text("Прозрачность: ${alpha.toInt()}%",color=Color.White); Slider(alpha,{alpha=it},valueRange=0f..100f)
             Button(onClick={showApps=true},modifier=Modifier.fillMaxWidth()) { Text("Добавить приложение") }
+            OutlinedButton(onClick={showUrl=true},modifier=Modifier.fillMaxWidth()) { Text("Добавить интернет-ссылку") }
+            OutlinedButton(onClick={cfg=cfg.copy(color=when(cfg.color){0xEE17251F->0xEE172034;0xEE172034->0xEE24334A;else->0xEE17251F})},modifier=Modifier.fillMaxWidth()) { Text("Изменить цвет панели") }
             Text("Ярлыки: ${cfg.items.size}/10",color=Color.White)
             LazyColumn(Modifier.weight(1f)) {
                 items(cfg.items) { item -> Row(Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically) { Text(item.label,color=Color.White,modifier=Modifier.weight(1f)); IconButton(onClick={cfg=cfg.copy(items=cfg.items-item)}) { Icon(Icons.Default.Delete,null,tint=Color.White) } } }
             }
-            OutlinedButton(onClick={showApps=true},modifier=Modifier.fillMaxWidth()) { Text("Добавить интернет-ссылку") }
             Button(onClick={PanelData.write(this@MainActivity,index,cfg.copy(title=title,alpha=alpha.toInt()));close()},modifier=Modifier.fillMaxWidth()) { Text("Сохранить") }
             if(showApps) AlertDialog(onDismissRequest={showApps=false},title={Text("Выберите приложение")},text={
                 LazyColumn(Modifier.heightIn(max=420.dp)) { items(apps) { app -> val label=pm.getApplicationLabel(app).toString()
@@ -76,6 +78,9 @@ class MainActivity : ComponentActivity() {
                     }
                 } }
             },confirmButton={TextButton(onClick={showApps=false}){Text("Готово")}})
+            if(showUrl) AlertDialog(onDismissRequest={showUrl=false},title={Text("Интернет-ссылка")},text={OutlinedTextField(url,{url=it},label={Text("Адрес сайта")})},confirmButton={
+                TextButton(onClick={ if(cfg.items.size<10 && url.startsWith("http")) cfg=cfg.copy(items=cfg.items+PanelItem(url,url,true)); showUrl=false }) { Text("Добавить") }
+            },dismissButton={TextButton(onClick={showUrl=false}){Text("Отмена")}})
         }
     }
 }
