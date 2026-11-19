@@ -37,7 +37,9 @@ class PanelService : Service() {
         if(!Settings.canDrawOverlays(this)) { stopSelf(); return }
         val v=View(this); val (w,h,yPercent)=PanelData.handle(this)
         v.background=GradientDrawable().apply { setColor(0xFF36A66A.toInt()); cornerRadius=30f }
-        val params=lp(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY).apply { width=(resources.displayMetrics.density*w/10).toInt().coerceAtLeast(8); height=(resources.displayMetrics.heightPixels*h/100).toInt().coerceIn(50,resources.displayMetrics.heightPixels); y=(resources.displayMetrics.heightPixels*yPercent/100) }
+        val screenHeight=resources.displayMetrics.heightPixels
+        val handleHeight=(screenHeight*h/100).toInt().coerceIn((resources.displayMetrics.density*50).toInt(),screenHeight)
+        val params=lp(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY).apply { width=(resources.displayMetrics.density*w).toInt().coerceAtLeast((resources.displayMetrics.density*8).toInt()); height=handleHeight; y=((screenHeight-handleHeight)*yPercent/100) }
         v.setOnTouchListener { _,e -> when(e.action) { MotionEvent.ACTION_DOWN -> { downX=e.rawX; true }; MotionEvent.ACTION_UP -> { if(downX-e.rawX>24) openPanel() else if(panel!=null) closePanel(); true }; else -> true } }
         handle=v; wm.addView(v,params)
     }
