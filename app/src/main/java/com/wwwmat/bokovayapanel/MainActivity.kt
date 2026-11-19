@@ -3,6 +3,7 @@ package com.wwwmat.bokovayapanel
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
             Text("Толщина полоски: $width dp", color=Color.White); Slider(width.toFloat(),{width=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=8f..40f)
             Text("Высота полоски: $height% экрана", color=Color.White); Slider(height.toFloat(),{height=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=10f..100f)
             Text("Положение по вертикали: $y%", color=Color.White); Slider(y.toFloat(),{y=it.toInt();PanelData.saveHandle(this@MainActivity,width,height,y)},valueRange=0f..100f)
-            Button(onClick={ if(!Settings.canDrawOverlays(this@MainActivity)) startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) else startService(Intent(this@MainActivity,PanelService::class.java)) }, modifier=Modifier.fillMaxWidth()) { Text(if(Settings.canDrawOverlays(this@MainActivity)) "Запустить боковую панель" else "Разрешить отображение поверх окон") }
+            Button(onClick={ if(!Settings.canDrawOverlays(this@MainActivity)) startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) else if(Build.VERSION.SDK_INT>=26) startForegroundService(Intent(this@MainActivity,PanelService::class.java)) else startService(Intent(this@MainActivity,PanelService::class.java)) }, modifier=Modifier.fillMaxWidth()) { Text(if(Settings.canDrawOverlays(this@MainActivity)) "Запустить боковую панель" else "Разрешить отображение поверх окон") }
             OutlinedButton(onClick={stopService(Intent(this@MainActivity,PanelService::class.java))}, modifier=Modifier.fillMaxWidth()) { Text("Остановить панель") }
             Text("Мои панели", color=Color.White, style=MaterialTheme.typography.titleLarge)
             repeat(count) { i -> Card(Modifier.fillMaxWidth().clickable { startActivity(Intent(this@MainActivity,MainActivity::class.java).putExtra("panel_index",i)) }, colors=CardDefaults.cardColors(containerColor=Color(0xFF20352B))) {
