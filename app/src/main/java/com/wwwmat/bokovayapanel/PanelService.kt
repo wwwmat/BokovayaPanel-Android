@@ -35,9 +35,9 @@ class PanelService : Service() {
     private fun lp(type:Int): WindowManager.LayoutParams = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT,type,WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT).apply { gravity=Gravity.TOP or Gravity.RIGHT }
     private fun showHandle() {
         if(!Settings.canDrawOverlays(this)) { stopSelf(); return }
-        val v=View(this); val (w,h,y)=PanelData.handle(this)
+        val v=View(this); val (w,h,yPercent)=PanelData.handle(this)
         v.background=GradientDrawable().apply { setColor(0xFF36A66A.toInt()); cornerRadius=30f }
-        val params=lp(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY).apply { width=(resources.displayMetrics.density*w/10).toInt().coerceAtLeast(8); height=(resources.displayMetrics.heightPixels*h/100).toInt().coerceIn(50,resources.displayMetrics.heightPixels); y=(resources.displayMetrics.heightPixels*y/100) }
+        val params=lp(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY).apply { width=(resources.displayMetrics.density*w/10).toInt().coerceAtLeast(8); height=(resources.displayMetrics.heightPixels*h/100).toInt().coerceIn(50,resources.displayMetrics.heightPixels); y=(resources.displayMetrics.heightPixels*yPercent/100) }
         v.setOnTouchListener { _,e -> when(e.action) { MotionEvent.ACTION_DOWN -> { downX=e.rawX; true }; MotionEvent.ACTION_UP -> { if(downX-e.rawX>24) openPanel() else if(panel!=null) closePanel(); true }; else -> true } }
         handle=v; wm.addView(v,params)
     }
