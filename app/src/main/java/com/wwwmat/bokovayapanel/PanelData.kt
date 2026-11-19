@@ -27,7 +27,7 @@ object PanelData {
     }
     fun handle(c: Context): Triple<Int,Int,Int> {
         val p=c.getSharedPreferences(PREF,0)
-        return Triple(p.getInt("handleWidth",18),p.getInt("handleHeight",110),p.getInt("handleY",50))
+        return Triple(p.getInt("handleWidth",18).coerceIn(8,40),p.getInt("handleHeight",35).coerceIn(10,100),p.getInt("handleY",50).coerceIn(0,100))
     }
     fun saveHandle(c:Context,w:Int,h:Int,y:Int) {
         c.getSharedPreferences(PREF,0).edit().putInt("handleWidth",w).putInt("handleHeight",h).putInt("handleY",y).apply()
